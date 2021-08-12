@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://static.tildacdn.com/js/jquery-1.10.2.min.js"></script>
+    <script src="fabric.js"></script>
+</head>
+
+<body>
+    <div id="demo-inf">
+        йцйцвйцвйцвцй
+        <div id="demo-layout">
+            <div id="header" class="t017__title t-title t-title_xxs">Принцип работы</div>
+            <div id="desc" class="t-section__descr t-descr t-descr_xl t-margin_auto">На примере категории "одежда":<br>
+                Введите артикул товара на Wildberries</div>
+            <input type="text" name="art" id="art" />
+            <button id="demo-test" name="go" class="t-btn">Подобрать шаблон</button>
+            <button id="makeStickerRect" name="" class="t-btn">Подобрать шаблон</button>
+            <button id="makeStickerCircle" name="" class="t-btn">Подобрать шаблон</button>
+
+            <input type="text" id="txtInp"></input>
+        </div>
+        <div id="demo-result">
+            <div id="template"></div>
+            <div id="photo-from-wb">
+                <canvas id="canvas"></canvas>
+            </div>
+            <div id="error-msg" class="t-section__descr t-descr t-descr_xl t-margin_auto">Фото не найдено!<br>Впишите в
+                поле реальный артикул</div>
+
+        </div>
+    </div>
+
+    <script type="text/javascript">
+    </script>
+    <style>
+        #rec342584010 {
+            display: none;
+
+        }
+
+        #demo-result {
+            display: none;
+            position: relative;
+            margin-top: 15px;
+            width: 450px;
+            height: 600px;
+            margin: 0 auto;
+        }
+
+        #demo-layout {
+            max-width: 755px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        #desc {
+            margin: 15px 0;
+        }
+
+        #error-msg {
+            margin: 20px 0;
+            color: rgb(173, 21, 21);
+            text-align: center;
+        }
+
+
+        #photo-from-wb,
+        #template {
+
+            position: relative;
+            background-size: cover !important;
+            width: 100%;
+            height: 600px;
+        }
+
+        #template {
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 1;
+
+        }
+
+        #demo-test {
+            color: #ffffff;
+            background-color: #40a0ff;
+            border-radius: 5px;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+        }
+
+        #art {
+            width: 175px;
+            height: 48px;
+            line-height: 50px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 25px;
+            border: 1px solid #40a0ff;
+            vertical-align: middle;
+            text-align: center;
+        }
+    </style>
+
+    <script>
+        // if(window.location.href.indexOf('demo')!=-1)
+        //     $('#demo-inf').css({
+        //         display: 'block'
+        //     })
+
+        var templates = [
+            'frame16.png',
+            'frame18.png',
+            'frame19.png',
+            'frame20.png'
+        ];
+
+        var deleteIcon = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg version='1.1' id='Ebene_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='595.275px' height='595.275px' viewBox='200 215 230 470' xml:space='preserve'%3E%3Ccircle style='fill:%23F44336;' cx='299.76' cy='439.067' r='218.516'/%3E%3Cg%3E%3Crect x='267.162' y='307.978' transform='matrix(0.7071 -0.7071 0.7071 0.7071 -222.6202 340.6915)' style='fill:white;' width='65.545' height='262.18'/%3E%3Crect x='266.988' y='308.153' transform='matrix(0.7071 0.7071 -0.7071 0.7071 398.3889 -83.3116)' style='fill:white;' width='65.544' height='262.179'/%3E%3C/g%3E%3C/svg%3E";
+        var img = document.createElement('img');
+        img.src = deleteIcon;
+
+        fabric.Object.prototype.controls.deleteControl = new fabric.Control({
+            x: 0.5,
+            y: -0.5,
+            offsetY: 16,
+            cursorStyle: 'pointer',
+            mouseUpHandler: deleteObject,
+            render: renderIcon,
+            cornerSize: 24
+        });
+
+        function deleteObject(eventData, transform) {
+            var target = transform.target;
+            var canvas = target.canvas;
+            canvas.remove(target);
+            canvas.requestRenderAll();
+        }
+
+        function renderIcon(ctx, left, top, styleOverride, fabricObject) {
+            var size = this.cornerSize;
+            ctx.save();
+            ctx.translate(left, top);
+            ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
+            ctx.drawImage(img, -size / 2, -size / 2, size, size);
+            ctx.restore();
+        }
+
+        var isfabriccanvasmade = true
+
+
+        $('#demo-test').click(function () {
+
+            var articul = $('#art').val(),
+                art1part = articul.substr(0, 4),
+                iRand = Math.floor(Math.random() * templates.length),
+                $button = $(this);
+
+            console.log(templates[iRand])
+
+            $.ajax({
+                url: 'https://images.wbstatic.net/big/new/' + art1part + '0000/' + articul + '-1.jpg',
+                success: function (resp) {
+                    console.log('yes')
+                    $('#error-msg').css({
+                        display: 'none'
+                    })
+                    $('#demo-result').css({
+                        display: 'block'
+                    });
+
+                    $('#photo-from-wb').css({
+                        background: 'url("https://images.wbstatic.net/big/new/' + art1part + '0000/' + articul + '-1.jpg") no-repeat 50% 50%',
+                        display: 'block'
+                    });
+
+                    $('#template').css({
+                        background: 'url("https://files.myguru.ru/site-templates/' + templates[iRand] + '") no-repeat 50% 50%',
+                        display: 'block'
+                    });
+
+                    $button.html('Другой шаблон');
+                    $('input[name=sku]').val(articul).parents('form:first').find('button:first').click();
+
+                    var canvas = document.getElementById('canvas');
+
+                    var ctx = canvas.getContext('2d');
+
+                    canvas.style.zIndex = 8;
+                    canvas.style.position = "absolute";
+                    canvas.style.border = "1px solid";
+                    canvas.height = $('#photo-from-wb').height();
+                    canvas.width = $('#photo-from-wb').width();
+
+                    if (isfabriccanvasmade) {
+                        canvas = new fabric.Canvas('canvas');
+                        iscanvasmade = false;
+                    }
+                    // makeStickerCircle
+                    function txtSet(txtInp) {
+                        myText.set('text', txtInp);
+
+                        canvas.renderAll();
+                    }
+                    $("#txtInp").on('change keydown paste input', function () {
+                        id = $(this).attr('id');
+                        val = $(this).attr('data-text');
+                        newtext = $(this).val();
+                        input = $(this);
+
+                        objs = canvas.getObjects();
+                        
+                        console.log(objs);
+                        objs.forEach(function (obj) {
+                            if (obj) {
+                                console.log(obj);
+                                obj.text = newtext ;
+                                input.attr("data-text", newtext);
+                                canvas.renderAll();
+                            }
+                        });
+                    });
+
+                    $('#makeStickerRect').click(function () {
+                        var rect = new fabric.Rect({
+                            left: 100,
+                            top: 50,
+                            fill: 'yellow',
+                            width: 200,
+                            height: 100,
+                            objectCaching: false,
+                            stroke: 'lightgreen',
+                            strokeWidth: 4,
+                        });
+
+                        canvas.add(rect);
+                        canvas.setActiveObject(rect);
+                    })
+                    $('#makeStickerCircle').click(function () {
+                        var myText = new fabric.Text('fabric 2.0', {
+                            underline: true,
+                            overline: true
+                        });
+
+                        canvas.add(myText);
+                        canvas.setActiveObject(myText);
+                    })
+
+
+                },
+                error: function () {
+                    $('#demo-result').css({
+                        display: 'block'
+                    });
+
+                    $('#error-msg').css({
+                        display: 'block'
+                    })
+
+                    $('#template').css({
+                        display: 'none'
+                    })
+                    $('#photo-from-wb').css({
+                        display: 'none'
+                    })
+
+                }
+            })
+
+
+            return false;
+        })
+
+    </script>
+
+</body>
+
+</html>
