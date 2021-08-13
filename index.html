@@ -8,17 +8,17 @@
 
 <body>
     <div id="demo-inf">
-        йцйцвйцвйцвцй
+        
         <div id="demo-layout">
             <div id="header" class="t017__title t-title t-title_xxs">Принцип работы</div>
             <div id="desc" class="t-section__descr t-descr t-descr_xl t-margin_auto">На примере категории "одежда":<br>
                 Введите артикул товара на Wildberries</div>
             <input type="text" name="art" id="art" />
             <button id="demo-test" name="go" class="t-btn">Подобрать шаблон</button>
-            <button id="makeStickerRect" name="" class="t-btn">Подобрать шаблон</button>
-            <button id="makeStickerCircle" name="" class="t-btn">Подобрать шаблон</button>
-
-            <input type="text" id="txtInp"></input>
+            <button id="makeStickerText1" name="" class="t-btn">Подобрать шаблон</button>
+            <button id="makeStickerText2" name="" class="t-btn">Подобрать шаблон</button>
+            <input class="form-control txtInpClass " data-text="text1" value="text1" id="cardalltexthex1" />
+            <input class="form-control txtInpClass" data-text="text2" value="text2" id="cardalltexthex2" />
         </div>
         <div id="demo-result">
             <div id="template"></div>
@@ -196,54 +196,48 @@
                         canvas = new fabric.Canvas('canvas');
                         iscanvasmade = false;
                     }
-                    // makeStickerCircle
-                    function txtSet(txtInp) {
-                        myText.set('text', txtInp);
 
-                        canvas.renderAll();
-                    }
-                    $("#txtInp").on('change keydown paste input', function () {
+                    $(".txtInpClass").on('change keydown paste input', function () {
                         id = $(this).attr('id');
                         val = $(this).attr('data-text');
                         newtext = $(this).val();
                         input = $(this);
 
                         objs = canvas.getObjects();
-                        
-                        console.log(objs);
+
                         objs.forEach(function (obj) {
-                            if (obj) {
-                                console.log(obj);
-                                obj.text = newtext ;
+                            console.log(obj.id)
+                            if (obj && obj.id == id) {
+                                obj.text = newtext;
                                 input.attr("data-text", newtext);
                                 canvas.renderAll();
                             }
                         });
                     });
 
-                    $('#makeStickerRect').click(function () {
-                        var rect = new fabric.Rect({
+                    $('#makeStickerText1').click(function () {
+                        var text1 = new fabric.Text("text1", {
+                            id: "cardalltexthex1",
+                            fontSize: 70,
                             left: 100,
-                            top: 50,
-                            fill: 'yellow',
-                            width: 200,
-                            height: 100,
-                            objectCaching: false,
-                            stroke: 'lightgreen',
-                            strokeWidth: 4,
+                            top: 0,
+                            fill: '#f00'
                         });
 
-                        canvas.add(rect);
-                        canvas.setActiveObject(rect);
+                        canvas.add(text1);
+                        canvas.setActiveObject(text1);
                     })
-                    $('#makeStickerCircle').click(function () {
-                        var myText = new fabric.Text('fabric 2.0', {
-                            underline: true,
-                            overline: true
+                    $('#makeStickerText2').click(function () {
+                        var text2 = new fabric.Text("text2", {
+                            id: "cardalltexthex2",
+                            fontSize: 70,
+                            left: 100,
+                            top: 100,
+                            fill: '#f00'
                         });
 
-                        canvas.add(myText);
-                        canvas.setActiveObject(myText);
+                        canvas.add(text2);
+                        canvas.setActiveObject(text2);
                     })
 
 
